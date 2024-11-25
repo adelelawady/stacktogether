@@ -9,7 +9,200 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      bookmarks: {
+        Row: {
+          bookmarked_profile_id: string | null
+          created_at: string
+          id: string
+          profile_id: string | null
+        }
+        Insert: {
+          bookmarked_profile_id?: string | null
+          created_at?: string
+          id?: string
+          profile_id?: string | null
+        }
+        Update: {
+          bookmarked_profile_id?: string | null
+          created_at?: string
+          id?: string
+          profile_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookmarks_bookmarked_profile_id_fkey"
+            columns: ["bookmarked_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookmarks_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      endorsements: {
+        Row: {
+          created_at: string
+          endorsed_profile_id: string | null
+          id: string
+          profile_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          endorsed_profile_id?: string | null
+          id?: string
+          profile_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          endorsed_profile_id?: string | null
+          id?: string
+          profile_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "endorsements_endorsed_profile_id_fkey"
+            columns: ["endorsed_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "endorsements_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          location: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          location?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          location?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      skills: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          is_active: boolean | null
+          name: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+        }
+        Relationships: []
+      }
+      social_links: {
+        Row: {
+          created_at: string
+          id: string
+          platform: string
+          profile_id: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          platform: string
+          profile_id?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          platform?: string
+          profile_id?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_links_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_skills: {
+        Row: {
+          created_at: string
+          id: string
+          profile_id: string | null
+          skill_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          profile_id?: string | null
+          skill_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          profile_id?: string | null
+          skill_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_skills_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_skills_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
