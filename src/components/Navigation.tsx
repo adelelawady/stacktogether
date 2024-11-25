@@ -1,9 +1,72 @@
-import { Search, User, LogIn } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Search, User, LogIn, LogOut, Menu, Settings } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const Navigation = () => {
+  const navigate = useNavigate();
+  const { user, profile, signOut } = useAuth();
+  
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate("/login");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
+  const menuItems = user ? (
+    <>
+      <DropdownMenuLabel>
+        <div className="flex flex-col space-y-1">
+          <p className="text-sm font-medium leading-none">{profile?.full_name}</p>
+          <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+        </div>
+      </DropdownMenuLabel>
+      <DropdownMenuSeparator />
+      <DropdownMenuGroup>
+        <DropdownMenuItem onClick={() => navigate("/profile")}>
+          <User className="mr-2 h-4 w-4" />
+          Profile
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate("/settings")}>
+          <Settings className="mr-2 h-4 w-4" />
+          Settings
+        </DropdownMenuItem>
+      </DropdownMenuGroup>
+      <DropdownMenuSeparator />
+      <DropdownMenuItem onClick={handleSignOut}>
+        <LogOut className="mr-2 h-4 w-4" />
+        Sign out
+      </DropdownMenuItem>
+    </>
+  ) : (
+    <DropdownMenuItem onClick={() => navigate("/login")}>
+      <LogIn className="mr-2 h-4 w-4" />
+      Sign in
+    </DropdownMenuItem>
+  );
+  
   return (
-    <nav className="bg-white shadow-sm">
+    <nav className="sticky top-0 z-50 bg-white border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -12,17 +75,98 @@ const Navigation = () => {
             </Link>
           </div>
           
-          <div className="flex items-center space-x-4">
-            <button className="p-2 text-gray-500 hover:text-primary transition-colors">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-4">
+            <Button variant="ghost" size="icon">
               <Search className="h-5 w-5" />
-            </button>
-            <button className="p-2 text-gray-500 hover:text-primary transition-colors">
-              <User className="h-5 w-5" />
-            </button>
-            <button className="flex items-center px-4 py-2 rounded-md bg-primary text-white hover:bg-primary/90 transition-colors">
-              <LogIn className="h-4 w-4 mr-2" />
-              Sign In
-            </button>
+            </Button>
+            
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={profile?.avatar_url || ""} alt={profile?.full_name || ""} />
+                      <AvatarFallback>{profile?.full_name?.charAt(0) || user.email?.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  {menuItems}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button onClick={() => navigate("/login")}>
+                <LogIn className="mr-2 h-4 w-4" />
+                Sign In
+              </Button>
+            )}
+          </div>
+
+          {/* Mobile Navigation */}
+          <div className="md:hidden flex items-center">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                <SheetHeader>
+                  <SheetTitle>Menu</SheetTitle>
+                </SheetHeader>
+                <div className="py-4">
+                  {user ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-4 px-2">
+                        <Avatar>
+                          <AvatarImage src={profile?.avatar_url || ""} />
+                          <AvatarFallback>{profile?.full_name?.charAt(0) || user.email?.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium leading-none">{profile?.full_name}</p>
+                          <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start"
+                          onClick={() => navigate("/profile")}
+                        >
+                          <User className="mr-2 h-4 w-4" />
+                          Profile
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start"
+                          onClick={() => navigate("/settings")}
+                        >
+                          <Settings className="mr-2 h-4 w-4" />
+                          Settings
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start"
+                          onClick={handleSignOut}
+                        >
+                          <LogOut className="mr-2 h-4 w-4" />
+                          Sign out
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button
+                      className="w-full"
+                      onClick={() => navigate("/login")}
+                    >
+                      <LogIn className="mr-2 h-4 w-4" />
+                      Sign In
+                    </Button>
+                  )}
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </div>
