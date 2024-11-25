@@ -1,35 +1,62 @@
+import { useEffect, useState } from "react";
 import Navigation from "@/components/Navigation";
 import SearchBar from "@/components/SearchBar";
 import UserCard from "@/components/UserCard";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
-const MOCK_USERS = [
-  {
-    name: "Sarah Johnson",
-    title: "Full Stack Developer",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-    bio: "Passionate about building scalable web applications and mentoring junior developers.",
-    skills: ["React", "Node.js", "TypeScript", "MongoDB"],
-  },
-  {
-    name: "Michael Chen",
-    title: "Frontend Engineer",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
-    bio: "Creating beautiful and accessible user interfaces with modern web technologies.",
-    skills: ["Vue.js", "TailwindCSS", "JavaScript", "Figma"],
-  },
-  {
-    name: "Emily Rodriguez",
-    title: "Backend Developer",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
-    bio: "Specialized in building robust APIs and microservices architectures.",
-    skills: ["Python", "Django", "PostgreSQL", "Docker"],
-  },
-];
+interface Profile {
+  id: string;
+  full_name: string;
+  bio: string;
+  avatar_url: string;
+  location: string;
+  skills: { name: string }[];
+  social_links: { platform: string; url: string }[];
+}
+
+const fetchProfiles = async (searchQuery: string = "") => {
+  let query = supabase
+    .from("profiles")
+    .select(`
+      *,
+      skills:user_skills(skill:skills(name)),
+      social_links(platform, url)
+    `);
+
+  if (searchQuery) {
+    query = query.or(
+      `full_name.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%,skills.skill.name.ilike.%${searchQuery}%`
+    );
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data as Profile[];
+};
 
 const Index = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  const { data: profiles, isLoading } = useQuery({
+    queryKey: ["profiles", searchQuery],
+    queryFn: () => fetchProfiles(searchQuery),
+  });
+
   const handleSearch = (query: string) => {
-    console.log("Searching for:", query);
+    setSearchQuery(query);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">Loading...</div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -51,8 +78,16 @@ const Index = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {MOCK_USERS.map((user) => (
-            <UserCard key={user.name} {...user} />
+          {profiles?.map((profile) => (
+            <UserCard
+              key={profile.id}
+              name={profile.full_name || "Anonymous"}
+              title="Developer" // This could be added to the profile table if needed
+              avatar={profile.avatar_url || "https://api.dicebear.com/7.x/avatars/svg?seed=" + profile.id}
+              bio={profile.bio || "No bio available"}
+              skills={profile.skills?.map((s) => s.skill.name) || []}
+              socialLinks={profile.social_links || []}
+            />
           ))}
         </div>
       </main>
