@@ -442,6 +442,13 @@ export type Database = {
         }
         Returns: Database["public"]["Enums"]["project_role"]
       }
+      get_user_project_role: {
+        Args: {
+          project_id: string
+          user_id: string
+        }
+        Returns: string
+      }
       is_admin: {
         Args: {
           userid: string
