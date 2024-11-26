@@ -255,7 +255,7 @@ const ProjectDetails = () => {
                       <div key={member.id} className="flex items-center space-x-3">
                         <Avatar>
                           <AvatarImage
-                            src={getAvatarUrl(member.profile.full_name || '')}
+                            src={getAvatarUrl(member.profile.full_name || '',member.profile.avatar_style)}
                             alt={member.profile.full_name || ''}
                           />
                           <AvatarFallback>

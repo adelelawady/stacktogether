@@ -78,10 +78,6 @@ const Navigation = () => {
           <User className="mr-2 h-4 w-4" />
           Profile
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate("/settings")}>
-          <Settings className="mr-2 h-4 w-4" />
-          Settings
-        </DropdownMenuItem>
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
       <DropdownMenuItem onClick={handleSignOut}>
@@ -126,10 +122,6 @@ const Navigation = () => {
           
           {/* Desktop User Menu */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" size="icon">
-              <Search className="h-5 w-5" />
-            </Button>
-            
             {user ? (
               <div className="flex items-center space-x-4">
                 <span className="text-sm font-medium">
@@ -140,13 +132,13 @@ const Navigation = () => {
                     <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0">
                       <Avatar>
                         <AvatarImage 
-                          src={getAvatarUrl(getDisplayName())} 
+                          src={getAvatarUrl(getDisplayName(),profile?.avatar_style)} 
                           alt={getDisplayName()} 
                         />
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuContent className="w-56 barMenu" align="end" forceMount>
                     {menuItems}
                   </DropdownMenuContent>
                 </DropdownMenu>

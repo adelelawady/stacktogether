@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDistanceToNow } from 'date-fns';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { getAvatarUrl } from "@/lib/avatar";
+import { AvatarStyle } from "@/lib/avatar";
 
 interface Skill {
   id: string;
@@ -27,6 +29,7 @@ interface UserCardProps {
   skills: Skill[];
   categories: string[] | null;
   onConnect?: (userId: string) => void;
+  avatar_style?: AvatarStyle;
 }
 
 const UserCard = ({ 
@@ -44,7 +47,8 @@ const UserCard = ({
   website_url,
   skills,
   categories,
-  onConnect 
+  onConnect,
+  avatar_style = 'lorelei',
 }: UserCardProps) => {
   const socialLinks = [
     { url: github_url, icon: Github, label: "GitHub", platform: 'github' },
@@ -67,7 +71,7 @@ const UserCard = ({
         <CardHeader className="flex flex-row items-start gap-4">
           <Avatar className="h-16 w-16">
             <AvatarImage 
-              src={avatar_url || ""} 
+              src={ getAvatarUrl(displayName, avatar_style)} 
               alt={displayName}
               className="object-cover"
             />
@@ -176,6 +180,7 @@ const UserCard = ({
             )}
           </div>
           <div className="flex space-x-2">
+            
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -189,6 +194,7 @@ const UserCard = ({
             <Button onClick={() => onConnect?.(id)}>
               Connect
             </Button>
+
           </div>
         </CardFooter>
       </Card>

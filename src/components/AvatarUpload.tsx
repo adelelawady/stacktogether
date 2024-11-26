@@ -6,6 +6,7 @@ import { uploadAvatar } from "@/lib/upload";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { getAvatarUrl } from "@/lib/avatar";
+import { AvatarStyle } from "@/lib/avatar";
 
 interface AvatarUploadProps {
   userId: string;
@@ -15,6 +16,7 @@ interface AvatarUploadProps {
   onUploadComplete: (url: string) => void;
   size?: "sm" | "md" | "lg";
   fallback: string;
+  style?: AvatarStyle;
 }
 
 const sizeClasses = {
@@ -30,7 +32,8 @@ export function AvatarUpload({
   name,
   onUploadComplete, 
   size = "md",
-  fallback 
+  fallback,
+  style = 'lorelei',
 }: AvatarUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -69,11 +72,11 @@ export function AvatarUpload({
   };
 
   const generateAvatar = async () => {
-    if (!email) return;
+    if (!name) return;
     
     try {
       setIsLoading(true);
-      const avatarUrl = await getAvatarUrl(email, name);
+      const avatarUrl = await getAvatarUrl(name, style);
       
       const { error: updateError } = await supabase
         .from('profiles')
@@ -117,7 +120,7 @@ export function AvatarUpload({
           size="icon"
           className="rounded-full"
           onClick={generateAvatar}
-          disabled={isLoading || isUploading || !email}
+          disabled={isLoading || isUploading || !name}
         >
           <Camera className="h-4 w-4" />
         </Button>

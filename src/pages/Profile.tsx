@@ -19,6 +19,16 @@ import { Loader2, Save, X } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import type { Database } from "@/types/database.types";
 import { CategorySelect } from "@/components/CategorySelect";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getAvatarUrl, type AvatarStyle } from "@/lib/avatar";
+
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type Skill = Database['public']['Tables']['skills']['Row'];
@@ -36,10 +46,20 @@ interface ProfileFormData {
   twitter_url: string | null;
   website_url: string | null;
   categories: string[];
+  avatar_style: AvatarStyle;
 }
 
+const avatarStyles: { value: AvatarStyle; label: string }[] = [
+  { value: 'lorelei', label: 'Lorelei' },
+  { value: 'bottts', label: 'Bottts' },
+  { value: 'pixel-art', label: 'Pixel Art' },
+  { value: 'avataaars', label: 'Avataaars' },
+  { value: 'big-ears', label: 'Big Ears' },
+  { value: 'adventurer', label: 'Adventurer' },
+];
+
 const Profile = () => {
-  const { profile, user } = useAuth();
+  const { profile, user, refreshProfile } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
@@ -58,6 +78,7 @@ const Profile = () => {
     twitter_url: '',
     website_url: '',
     categories: [],
+    avatar_style: 'lorelei',
   });
 
   useEffect(() => {
@@ -73,6 +94,7 @@ const Profile = () => {
         twitter_url: profile.twitter_url || '',
         website_url: profile.website_url || '',
         categories: profile.categories || [],
+        avatar_style: profile.avatar_style || 'lorelei',
       });
     }
   }, [profile]);
@@ -204,6 +226,9 @@ const Profile = () => {
 
       if (error) throw error;
 
+      // Refresh the profile in AuthContext to update navbar
+      await refreshProfile();
+
       toast({
         title: "Success",
         description: "Profile updated successfully!",
@@ -217,6 +242,48 @@ const Profile = () => {
       });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleAvatarStyleChange = async (value: AvatarStyle) => {
+    if (!user) return;
+    
+    try {
+      // Generate new avatar URL with selected style
+      const avatarUrl = getAvatarUrl(formData.full_name, value);
+      
+      // Update profile with new avatar style and URL
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          avatar_style: value,
+          avatar_url: avatarUrl,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      // Refresh the profile in AuthContext to update navbar
+      await refreshProfile();
+
+      // Update local state
+      setFormData(prev => ({
+        ...prev,
+        avatar_style: value
+      }));
+
+      toast({
+        title: "Success",
+        description: "Avatar style updated successfully!",
+      });
+    } catch (error) {
+      console.error('Error updating avatar style:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update avatar style",
+      });
     }
   };
 
@@ -244,6 +311,37 @@ const Profile = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-24 w-24">
+                  <AvatarImage
+                    src={getAvatarUrl(formData.full_name, formData.avatar_style)}
+                    alt={formData.full_name}
+                  />
+                  <AvatarFallback>
+                    {formData.full_name?.charAt(0) || 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="space-y-2">
+                  <Label>Avatar Style</Label>
+                  <br />
+                  <small>Avatar icon is generated based on your name</small>
+                  <Select
+                    value={formData.avatar_style}
+                    onValueChange={handleAvatarStyleChange}
+                  >
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue placeholder="Select style" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {avatarStyles.map(style => (
+                        <SelectItem key={style.value} value={style.value}>
+                          {style.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="full_name">Full Name</Label>

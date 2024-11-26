@@ -75,3 +75,26 @@
     @apply bg-background text-foreground;
   }
 }
+
+.tabs-list {
+  @apply inline-flex h-10 items-center justify-center rounded-md  p-1 ;
+}
+
+.tabs-trigger {
+  @apply inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/50;
+}
+
+/* Add responsive styles */
+@media (max-width: 640px) {
+  .tabs-list {
+    @apply flex-wrap gap-2;
+  }
+  
+  .tabs-trigger {
+    @apply flex-1 min-w-[40px];
+  }
+}
+
+.barMenu{
+  background: white;
+}

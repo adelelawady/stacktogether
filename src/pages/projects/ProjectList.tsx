@@ -12,7 +12,7 @@ import type { ProjectWithDetails } from "@/types/project.types";
 
 const ProjectList = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [projects, setProjects] = useState<ProjectWithDetails[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -70,9 +70,10 @@ const ProjectList = () => {
     <div className="min-h-screen bg-gray-50">
       <Navigation />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+       
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Projects</h1>
-          {user && (
+          {profile?.role === 'admin' && (
             <Button onClick={() => navigate("/projects/new")}>
               <Plus className="mr-2 h-4 w-4" />
               Create Project

@@ -10,6 +10,7 @@ export type UserRole = 'user' | 'admin' | 'moderator';
 export type ProjectRole = 'owner' | 'admin' | 'moderator' | 'member';
 export type ProjectStatus = 'active' | 'archived' | 'draft';
 export type JoinRequestStatus = 'pending' | 'approved' | 'rejected';
+export type AvatarStyle = 'circle' | 'square' | 'rounded' | 'none';
 
 export interface Database {
   public: {
@@ -20,6 +21,7 @@ export interface Database {
           full_name: string | null
           bio: string | null
           avatar_url: string | null
+          avatar_style: AvatarStyle | null
           location: string | null
           created_at: string
           updated_at: string
@@ -38,6 +40,7 @@ export interface Database {
           full_name?: string | null
           bio?: string | null
           avatar_url?: string | null
+          avatar_style?: AvatarStyle | null
           location?: string | null
           created_at?: string
           updated_at?: string
@@ -56,6 +59,7 @@ export interface Database {
           full_name?: string | null
           bio?: string | null
           avatar_url?: string | null
+          avatar_style?: AvatarStyle | null
           location?: string | null
           created_at?: string
           updated_at?: string

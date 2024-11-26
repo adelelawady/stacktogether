@@ -7,9 +7,20 @@ import { CategoriesManagement } from "./tabs/CategoriesManagement";
 import { SkillsManagement } from "./tabs/SkillsManagement";
 import { MembersManagement } from "./tabs/MembersManagement";
 import { JoinRequestsManagement } from "./tabs/JoinRequestsManagement";
+import { ProjectsManagement } from "./tabs/ProjectsManagement";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
-import { ProjectsManagement } from "./tabs/ProjectsManagement";
+import { Users, Grid, Settings, UserPlus, FolderKanban, Wrench } from "lucide-react";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+
+const tabs = [
+  { id: "users", label: "Users", icon: Users },
+  { id: "projects", label: "Projects", icon: FolderKanban },
+  { id: "members", label: "Members", icon: UserPlus },
+  { id: "requests", label: "Requests", icon: Settings },
+  { id: "categories", label: "Categories", icon: Grid },
+  { id: "skills", label: "Skills", icon: Wrench },
+];
 
 const AdminDashboard = () => {
   const { profile } = useAuth();
@@ -25,33 +36,48 @@ const AdminDashboard = () => {
       <Navigation />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Card>
-          <CardHeader>
+          <CardHeader className="border-b">
             <CardTitle>Admin Dashboard</CardTitle>
           </CardHeader>
-          <CardContent>
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="users">Users</TabsTrigger>
-                <TabsTrigger value="projects">Projects</TabsTrigger>
-                <TabsTrigger value="members">Members</TabsTrigger>
-                <TabsTrigger value="requests">Join Requests</TabsTrigger>
-                <TabsTrigger value="categories">Categories</TabsTrigger>
-              </TabsList>
-              <TabsContent value="users">
-                <UsersManagement />
-              </TabsContent>
-              <TabsContent value="projects">
-                <ProjectsManagement />
-              </TabsContent>
-              <TabsContent value="members">
-                <MembersManagement />
-              </TabsContent>
-              <TabsContent value="requests">
-                <JoinRequestsManagement />
-              </TabsContent>
-              <TabsContent value="categories">
-                <CategoriesManagement />
-              </TabsContent>
+          <CardContent className="p-0">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <div className="border-b">
+                <ScrollArea className="w-full whitespace-nowrap">
+                  <TabsList className="inline-flex h-14 items-center justify-start gap-4 p-4">
+                    {tabs.map(({ id, label, icon: Icon }) => (
+                      <TabsTrigger
+                        key={id}
+                        value={id}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium transition-all"
+                      >
+                        <Icon className="h-4 w-4" />
+                        <span className="hidden sm:inline">{label}</span>
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                  <ScrollBar orientation="horizontal" className="invisible" />
+                </ScrollArea>
+              </div>
+              <div className="p-4">
+                <TabsContent value="users" className="m-0">
+                  <UsersManagement />
+                </TabsContent>
+                <TabsContent value="projects" className="m-0">
+                  <ProjectsManagement />
+                </TabsContent>
+                <TabsContent value="members" className="m-0">
+                  <MembersManagement />
+                </TabsContent>
+                <TabsContent value="requests" className="m-0">
+                  <JoinRequestsManagement />
+                </TabsContent>
+                <TabsContent value="categories" className="m-0">
+                  <CategoriesManagement />
+                </TabsContent>
+                <TabsContent value="skills" className="m-0">
+                  <SkillsManagement />
+                </TabsContent>
+              </div>
             </Tabs>
           </CardContent>
         </Card>

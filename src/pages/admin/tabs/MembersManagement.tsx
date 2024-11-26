@@ -143,75 +143,95 @@ export function MembersManagement() {
               <TableHead>Member</TableHead>
               <TableHead>Project</TableHead>
               <TableHead>Role</TableHead>
+              <TableHead>Categories</TableHead>
               <TableHead>Joined</TableHead>
               <TableHead className="w-[70px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredMembers.map((member) => (
-              <TableRow key={member.id}>
-                <TableCell>
-                  <div className="flex items-center space-x-3">
-                    <Avatar>
-                      <AvatarImage
-                        src={getAvatarUrl(member.profile.full_name || '')}
-                        alt={member.profile.full_name || ''}
-                      />
-                      <AvatarFallback>
-                        {member.profile.full_name?.charAt(0) || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{member.profile.full_name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {member.profile.title}
-                      </p>
+            {filteredMembers.map((member) => {
+              const displayName = member.profile.full_name || 'Anonymous User';
+              const initials = displayName
+                .split(' ')
+                .map(n => n[0])
+                .join('')
+                .toUpperCase()
+                .slice(0, 2);
+
+              return (
+                <TableRow key={member.id}>
+                  <TableCell>
+                    <div className="flex items-center space-x-3">
+                      <Avatar>
+                        <AvatarImage
+                          src={getAvatarUrl(displayName, member.profile.avatar_style || 'lorelei')}
+                          alt={displayName}
+                        />
+                        <AvatarFallback>
+                          {initials}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium">{displayName}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {member.profile.title}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell>{member.project.name}</TableCell>
-                <TableCell>
-                  <Badge variant="outline" className="capitalize">
-                    {member.role}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  {new Date(member.created_at).toLocaleDateString()}
-                </TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() => updateMemberRole(member.id, 'admin')}
-                      >
-                        Make Admin
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => updateMemberRole(member.id, 'moderator')}
-                      >
-                        Make Moderator
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => updateMemberRole(member.id, 'member')}
-                      >
-                        Make Member
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => removeMember(member.id)}
-                        className="text-red-600"
-                      >
-                        Remove Member
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
+                  </TableCell>
+                  <TableCell>{member.project.name}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="capitalize">
+                      {member.role}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {member.profile.categories?.map((category) => (
+                        <Badge key={category} variant="secondary" className="capitalize">
+                          {category.replace('_', ' ')}
+                        </Badge>
+                      ))}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {new Date(member.created_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() => updateMemberRole(member.id, 'admin')}
+                        >
+                          Make Admin
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => updateMemberRole(member.id, 'moderator')}
+                        >
+                          Make Moderator
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => updateMemberRole(member.id, 'member')}
+                        >
+                          Make Member
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => removeMember(member.id)}
+                          className="text-red-600"
+                        >
+                          Remove Member
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>

@@ -1,69 +1,95 @@
-# Welcome to your Lovable project
+# StackConnect
 
-## Project info
+StackConnect is a platform that connects developers based on their skills, interests, and project collaborations. It provides a space for developers to showcase their expertise, join projects, and build meaningful professional connections.
 
-**URL**: https://lovable.dev/projects/7e8d107d-e262-40ac-83b7-536b3379f71f
+## Features
 
-## How can I edit this code?
+- 🔐 Authentication with Email and Google
+- 👤 Customizable Developer Profiles
+- 🎨 Dynamic Avatar Generation
+- 🏷️ Skill and Category Management
+- 👥 Project Collaboration
+- 🤝 Team Management
+- 📊 Admin Dashboard
+- 📱 Responsive Design
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+- **Frontend**: React, TypeScript, Tailwind CSS
+- **Backend**: Supabase
+- **Authentication**: Supabase Auth
+- **Database**: PostgreSQL (via Supabase)
+- **Storage**: Supabase Storage
+- **UI Components**: shadcn/ui
+- **Icons**: Lucide Icons
+- **Avatar Generation**: DiceBear
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/7e8d107d-e262-40ac-83b7-536b3379f71f) and start prompting.
+## Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+1. Clone the repository:
 
-**Use your preferred IDE**
+```
+git clone https://github.com/adelelawady/stacktogether.git
+cd stacktogether
+```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+2. Install dependencies:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+```
+npm install
+```
 
-Follow these steps:
+3. Set up environment variables:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Create a `.env` file in the root directory and add:
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+```
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+4. Start the development server:
+
+
+```
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Project Structure
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```
 
-**Use GitHub Codespaces**
+src/
+├── components/ # Reusable UI components
+├── contexts/ # React contexts
+├── hooks/ # Custom React hooks
+├── lib/ # Utility functions
+├── pages/ # Page components
+├── types/ # TypeScript type definitions
+└── styles/ # Global styles
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```
 
-## What technologies are used for this project?
 
-This project is built with .
+## Contributing
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## How can I deploy this project?
+## License
 
-Simply open [Lovable](https://lovable.dev/projects/7e8d107d-e262-40ac-83b7-536b3379f71f) and click on Share -> Publish.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## I want to use a custom domain - is that possible?
+## Author
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+Adel Elawady - [GitHub](https://github.com/adelelawady)
+
+## Acknowledgments
+
+- [Supabase](https://supabase.io/) for the backend infrastructure
+- [shadcn/ui](https://ui.shadcn.com/) for the UI components
+- [DiceBear](https://www.dicebear.com/) for the avatar generation

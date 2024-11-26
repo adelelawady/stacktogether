@@ -28,19 +28,47 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Skill = Database['public']['Tables']['skills']['Row'];
 
 export function SkillsManagement() {
   const [skills, setSkills] = useState<Skill[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isAddingSkill, setIsAddingSkill] = useState(false);
+  const [newSkill, setNewSkill] = useState({
+    name: '',
+    category: '',
+    is_active: true
+  });
   const { toast } = useToast();
 
   useEffect(() => {
     fetchSkills();
+    fetchCategories();
   }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('name')
+        .eq('is_active', true);
+
+      if (error) throw error;
+      setCategories(data.map(c => c.name));
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   const fetchSkills = async () => {
     try {
@@ -63,16 +91,11 @@ export function SkillsManagement() {
     }
   };
 
-  const handleAddSkill = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const name = formData.get("name") as string;
-    const category = formData.get("category") as string;
-
+  const handleAddSkill = async () => {
     try {
       const { error } = await supabase
         .from('skills')
-        .insert({ name, category });
+        .insert([newSkill]);
 
       if (error) throw error;
 
@@ -81,8 +104,9 @@ export function SkillsManagement() {
         description: "Skill added successfully",
       });
 
-      fetchSkills();
       setIsAddingSkill(false);
+      setNewSkill({ name: '', category: '', is_active: true });
+      fetchSkills();
     } catch (error) {
       toast({
         variant: "destructive",
@@ -103,7 +127,7 @@ export function SkillsManagement() {
 
       toast({
         title: "Success",
-        description: "Skill status updated",
+        description: "Skill status updated successfully",
       });
 
       fetchSkills();
@@ -116,10 +140,15 @@ export function SkillsManagement() {
     }
   };
 
-  const filteredSkills = skills.filter(skill =>
-    skill.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    skill.category?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredSkills = skills.filter(skill => {
+    if (!searchQuery) return true;
+    
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      skill.name.toLowerCase().includes(searchLower) ||
+      skill.category?.toLowerCase().includes(searchLower)
+    );
+  });
 
   return (
     <div className="space-y-4">
@@ -144,18 +173,37 @@ export function SkillsManagement() {
             <DialogHeader>
               <DialogTitle>Add New Skill</DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleAddSkill} className="space-y-4">
+            <form onSubmit={(e) => { e.preventDefault(); handleAddSkill(); }} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Name</Label>
-                <Input id="name" name="name" required />
+                <Input
+                  id="name"
+                  value={newSkill.name}
+                  onChange={(e) => setNewSkill(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="Enter skill name"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="category">Category</Label>
-                <Input id="category" name="category" />
+                <Select
+                  value={newSkill.category}
+                  onValueChange={(value) => setNewSkill(prev => ({ ...prev, category: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map(category => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-              <Button type="submit" className="w-full">
-                Add Skill
-              </Button>
+              <div className="flex justify-end">
+                <Button type="submit">Add Skill</Button>
+              </div>
             </form>
           </DialogContent>
         </Dialog>
@@ -203,6 +251,16 @@ export function SkillsManagement() {
           </TableBody>
         </Table>
       </div>
+
+      {filteredSkills.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-lg text-gray-600">
+            {searchQuery 
+              ? "No skills found matching your search criteria."
+              : "No skills available at the moment."}
+          </p>
+        </div>
+      )}
     </div>
   );
 } 

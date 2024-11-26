@@ -14,6 +14,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import ProjectList from "./pages/projects/ProjectList";
 import ProjectForm from "./pages/projects/ProjectForm";
 import ProjectDetails from "./pages/projects/ProjectDetails";
+import AuthCallback from "./pages/auth/AuthCallback";
 
 const queryClient = new QueryClient();
 const basename = import.meta.env.DEV ? '' : '/stacktogether';
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/projects/new" element={<ProjectForm />} />
             <Route path="/projects/:projectId/edit" element={<ProjectForm />} />
             <Route path="/projects/:projectId" element={<ProjectDetails />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
