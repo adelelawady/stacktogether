@@ -1,11 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import MDEditor from "@uiw/react-md-editor";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -13,24 +10,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { CategorySelect } from "@/components/CategorySelect";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Save } from "lucide-react";
 import Navigation from "@/components/Navigation";
+import { ProjectBasicInfo } from "@/components/projects/ProjectBasicInfo";
+import { ProjectContent } from "@/components/projects/ProjectContent";
+import { ProjectLinks } from "@/components/projects/ProjectLinks";
+import { ProjectSettings } from "@/components/projects/ProjectSettings";
 import type { Category } from "@/types/database.types";
 import type { ProjectFormData, Project } from "@/types/project.types";
 
 const ProjectForm = () => {
-  const { projectId: urlProjectId } = useParams();
-  const [currentProjectId, setCurrentProjectId] = useState(urlProjectId);
+  const { projectId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -50,7 +42,7 @@ const ProjectForm = () => {
 
   useEffect(() => {
     loadData();
-  }, [urlProjectId]);
+  }, [projectId]);
 
   const loadData = async () => {
     try {
@@ -66,12 +58,14 @@ const ProjectForm = () => {
       }
 
       // Load project data if editing
-      if (urlProjectId) {
-        const { data: project } = await supabase
+      if (projectId) {
+        const { data: project, error } = await supabase
           .from('projects')
           .select('*')
-          .eq('id', urlProjectId)
+          .eq('id', projectId)
           .single();
+
+        if (error) throw error;
 
         if (project) {
           setFormData({
@@ -120,14 +114,19 @@ const ProjectForm = () => {
         updated_at: new Date().toISOString(),
       };
 
-      if (currentProjectId) {
+      if (projectId) {
         // Update existing project
         const { error } = await supabase
           .from('projects')
           .update(projectData)
-          .eq('id', currentProjectId);
+          .eq('id', projectId);
 
         if (error) throw error;
+
+        toast({
+          title: "Success",
+          description: "Project updated successfully!",
+        });
       } else {
         // Create new project
         const { data, error } = await supabase
@@ -148,15 +147,13 @@ const ProjectForm = () => {
             status: 'approved',
           });
 
-        setCurrentProjectId(data.id);
+        toast({
+          title: "Success",
+          description: "Project created successfully!",
+        });
       }
 
-      toast({
-        title: "Success",
-        description: `Project ${currentProjectId ? 'updated' : 'created'} successfully!`,
-      });
-
-      navigate(`/projects/${currentProjectId}`);
+      navigate(`/projects/${projectId || ''}`);
     } catch (error) {
       console.error('Error saving project:', error);
       toast({
@@ -186,72 +183,28 @@ const ProjectForm = () => {
       <main className="max-w-4xl mx-auto px-4 py-8">
         <Card>
           <CardHeader>
-            <CardTitle>{currentProjectId ? 'Edit' : 'Create'} Project</CardTitle>
+            <CardTitle>{projectId ? 'Edit' : 'Create'} Project</CardTitle>
             <CardDescription>
-              {currentProjectId ? 'Update your project details' : 'Create a new project'}
+              {projectId ? 'Update your project details' : 'Create a new project'}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Project Name</Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    placeholder="My Awesome Project"
-                    required
-                  />
-                </div>
+                <ProjectBasicInfo
+                  formData={formData}
+                  handleInputChange={handleInputChange}
+                />
 
-                <div className="space-y-2">
-                  <Label htmlFor="description">Short Description</Label>
-                  <Input
-                    id="description"
-                    name="description"
-                    value={formData.description || ''}
-                    onChange={handleInputChange}
-                    placeholder="A brief description of your project"
-                  />
-                </div>
+                <ProjectContent
+                  content={formData.content || ''}
+                  onChange={(value) => setFormData(prev => ({ ...prev, content: value || '' }))}
+                />
 
-                <div className="space-y-2">
-                  <Label>Project Content</Label>
-                  <div data-color-mode="light">
-                    <MDEditor
-                      value={formData.content || ''}
-                      onChange={(value) => setFormData(prev => ({ ...prev, content: value || '' }))}
-                      preview="edit"
-                      height={400}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="code_url">Code Repository URL</Label>
-                    <Input
-                      id="code_url"
-                      name="code_url"
-                      value={formData.code_url || ''}
-                      onChange={handleInputChange}
-                      placeholder="https://github.com/username/project"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="demo_url">Demo URL</Label>
-                    <Input
-                      id="demo_url"
-                      name="demo_url"
-                      value={formData.demo_url || ''}
-                      onChange={handleInputChange}
-                      placeholder="https://my-project.com"
-                    />
-                  </div>
-                </div>
+                <ProjectLinks
+                  formData={formData}
+                  handleInputChange={handleInputChange}
+                />
 
                 <div className="space-y-4">
                   <Label>Categories</Label>
@@ -262,41 +215,15 @@ const ProjectForm = () => {
                   />
                 </div>
 
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Project Visibility</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Make project visible to everyone
-                      </p>
-                    </div>
-                    <Switch
-                      checked={formData.is_public}
-                      onCheckedChange={(checked) => 
-                        setFormData(prev => ({ ...prev, is_public: checked }))
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Project Status</Label>
-                  <Select
-                    value={formData.status}
-                    onValueChange={(value) => 
-                      setFormData(prev => ({ ...prev, status: value as Project['status'] }))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="archived">Archived</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <ProjectSettings
+                  formData={formData}
+                  onVisibilityChange={(checked) => 
+                    setFormData(prev => ({ ...prev, is_public: checked }))
+                  }
+                  onStatusChange={(value) => 
+                    setFormData(prev => ({ ...prev, status: value as Project['status'] }))
+                  }
+                />
               </div>
 
               <div className="flex justify-end space-x-4">
@@ -316,7 +243,7 @@ const ProjectForm = () => {
                   ) : (
                     <>
                       <Save className="mr-2 h-4 w-4" />
-                      {currentProjectId ? 'Update' : 'Create'} Project
+                      {projectId ? 'Update' : 'Create'} Project
                     </>
                   )}
                 </Button>
@@ -329,4 +256,4 @@ const ProjectForm = () => {
   );
 };
 
-export default ProjectForm; 
+export default ProjectForm;
