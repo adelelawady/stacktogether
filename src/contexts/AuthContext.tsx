@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/types/database.types';
+import { getAvatarUrl } from '@/lib/avatar';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
@@ -55,6 +56,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .select('*')
       .eq('id', userId)
       .single();
+      
+    if (data && !data.avatar_url) {
+      // If profile exists but has no avatar, generate one
+      const avatarUrl = await getAvatarUrl(data.id, data.full_name);
+      await supabase
+        .from('profiles')
+        .update({ avatar_url: avatarUrl })
+        .eq('id', userId);
+      data.avatar_url = avatarUrl;
+    }
+    
     setProfile(data);
     setIsLoading(false);
   };
@@ -77,7 +89,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         },
       },
     });
+    
     if (error) throw error;
+    
+    if (data.user) {
+      // Generate and set avatar URL
+      const avatarUrl = await getAvatarUrl(email, fullName);
+      
+      await supabase
+        .from('profiles')
+        .update({ 
+          avatar_url: avatarUrl,
+          full_name: fullName 
+        })
+        .eq('id', data.user.id);
+    }
+    
     return data;
   };
 

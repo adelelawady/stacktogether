@@ -18,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Save, X } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import type { Database } from "@/types/database.types";
+import { CategorySelect } from "@/components/CategorySelect";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type Skill = Database['public']['Tables']['skills']['Row'];
@@ -34,31 +35,38 @@ const Profile = () => {
   const [availableSkills, setAvailableSkills] = useState<Skill[]>([]);
   const [userSkills, setUserSkills] = useState<UserSkill[]>([]);
   const [formData, setFormData] = useState<ProfileFormData>({
-    full_name: null,
-    title: null,
-    bio: null,
-    location: null,
-    avatar_url: null,
-    years_of_experience: null,
-    github_url: null,
-    linkedin_url: null,
-    twitter_url: null,
-    website_url: null,
+    full_name: '',
+    title: '',
+    bio: '',
+    location: '',
+    avatar_url: '',
+    years_of_experience: 0,
+    github_url: '',
+    linkedin_url: '',
+    twitter_url: '',
+    website_url: '',
+    categories: [],
+    role: 'user',
+    email: ''
   });
+  const [categories, setCategories] = useState<Database['public']['Tables']['categories']['Row'][]>([]);
 
   useEffect(() => {
     if (profile) {
       setFormData({
-        full_name: profile.full_name,
-        title: profile.title,
-        bio: profile.bio,
-        location: profile.location,
-        avatar_url: profile.avatar_url,
-        years_of_experience: profile.years_of_experience,
-        github_url: profile.github_url,
-        linkedin_url: profile.linkedin_url,
-        twitter_url: profile.twitter_url,
-        website_url: profile.website_url,
+        full_name: profile.full_name || '',
+        title: profile.title || '',
+        bio: profile.bio || '',
+        location: profile.location || '',
+        avatar_url: profile.avatar_url || '',
+        years_of_experience: profile.years_of_experience || 0,
+        github_url: profile.github_url || '',
+        linkedin_url: profile.linkedin_url || '',
+        twitter_url: profile.twitter_url || '',
+        website_url: profile.website_url || '',
+        categories: profile.categories || [],
+        role: profile.role,
+        email: profile.email || ''
       });
     }
   }, [profile]);
@@ -68,6 +76,16 @@ const Profile = () => {
       if (!user) return;
 
       try {
+        // Load categories
+        const { data: categoriesData } = await supabase
+          .from('categories')
+          .select('*')
+          .order('name');
+
+        if (categoriesData) {
+          setCategories(categoriesData);
+        }
+
         // Load available skills
         const { data: skills } = await supabase
           .from('skills')
@@ -104,7 +122,7 @@ const Profile = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value === "" ? null : value,
+      [name]: value
     }));
   };
 
@@ -146,6 +164,13 @@ const Profile = () => {
         description: "Failed to update skills. Please try again.",
       });
     }
+  };
+
+  const handleCategoryChange = (selectedCategories: string[]) => {
+    setFormData(prev => ({
+      ...prev,
+      categories: selectedCategories,
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -304,6 +329,18 @@ const Profile = () => {
                     placeholder="https://yourwebsite.com"
                   />
                 </div>
+              </div>
+
+              <div className="space-y-4">
+                <Label>Categories</Label>
+                <p className="text-sm text-muted-foreground">
+                  Select the categories that best describe your expertise
+                </p>
+                <CategorySelect
+                  categories={categories}
+                  selectedCategories={formData.categories || []}
+                  onChange={handleCategoryChange}
+                />
               </div>
 
               <div className="space-y-4">

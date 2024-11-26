@@ -25,6 +25,7 @@ interface UserCardProps {
   twitter_url: string | null;
   website_url: string | null;
   skills: Skill[];
+  categories: string[] | null;
   onConnect?: (userId: string) => void;
 }
 
@@ -42,6 +43,7 @@ const UserCard = ({
   twitter_url,
   website_url,
   skills,
+  categories,
   onConnect 
 }: UserCardProps) => {
   const socialLinks = [
@@ -51,18 +53,32 @@ const UserCard = ({
     { url: website_url, icon: Globe, label: "Website" },
   ].filter(link => link.url);
 
+  const displayName = full_name || "Anonymous User";
+  const initials = displayName
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+
   return (
     <TooltipProvider>
-      <Card className="hover:shadow-md transition-shadow">
+      <Card className="hover:shadow-md transition-shadow flex flex-col h-full">
         <CardHeader className="flex flex-row items-start gap-4">
           <Avatar className="h-16 w-16">
-            <AvatarImage src={avatar_url || ""} alt={full_name || ""} />
-            <AvatarFallback>{full_name?.charAt(0) || "U"}</AvatarFallback>
+            <AvatarImage 
+              src={avatar_url || ""} 
+              alt={displayName}
+              className="object-cover"
+            />
+            <AvatarFallback className="text-lg bg-primary/10">
+              {initials}
+            </AvatarFallback>
           </Avatar>
-          <div className="flex flex-col flex-grow">
+          <div className="flex flex-col flex-grow min-h-[80px]">
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="text-lg font-semibold">{full_name}</h3>
+                <h3 className="text-lg font-semibold">{displayName}</h3>
                 {title && (
                   <p className="text-sm text-muted-foreground">{title}</p>
                 )}
@@ -81,55 +97,83 @@ const UserCard = ({
                 </Tooltip>
               )}
             </div>
-            {location && (
-              <div className="flex items-center text-sm text-muted-foreground mt-1">
-                <MapPin className="mr-1 h-4 w-4" />
-                {location}
+            <div className="flex flex-col gap-1 mt-2">
+              {location && (
+                <div className="flex items-center text-sm text-muted-foreground">
+                  <MapPin className="mr-1 h-4 w-4 shrink-0" />
+                  <span className="truncate">{location}</span>
+                </div>
+              )}
+              <div className="flex items-center text-sm text-muted-foreground">
+                <Calendar className="mr-1 h-4 w-4 shrink-0" />
+                <span className="truncate">
+                  Joined {formatDistanceToNow(new Date(created_at), { addSuffix: true })}
+                </span>
               </div>
-            )}
-            <div className="flex items-center text-sm text-muted-foreground mt-1">
-              <Calendar className="mr-1 h-4 w-4" />
-              Joined {formatDistanceToNow(new Date(created_at), { addSuffix: true })}
             </div>
           </div>
         </CardHeader>
         
-        <CardContent className="space-y-4">
-          {bio && (
+        <CardContent className="flex-grow space-y-4">
+          {bio ? (
             <p className="text-sm text-gray-600 line-clamp-3">
               {bio}
             </p>
+          ) : (
+            <p className="text-sm text-muted-foreground italic">
+              No bio provided
+            </p>
           )}
           
-          {skills.length > 0 && (
+          {categories && categories.length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {skills.map((skill) => (
-                <Badge key={skill.id} variant="secondary">
-                  {skill.name}
+              {categories.map((category) => (
+                <Badge key={category} variant="secondary" className="capitalize">
+                  {category}
                 </Badge>
               ))}
             </div>
           )}
+          
+          <div className="flex flex-wrap gap-2">
+            {skills.length > 0 ? (
+              skills.map((skill) => (
+                <Badge key={skill.id} variant="secondary">
+                  {skill.name}
+                </Badge>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground italic">
+                No skills listed
+              </p>
+            )}
+          </div>
         </CardContent>
         
-        <CardFooter className="flex justify-between">
+        <CardFooter className="flex justify-between mt-auto pt-6 border-t">
           <div className="flex space-x-2">
-            {socialLinks.map(({ url, icon: Icon, label }) => (
-              <Tooltip key={url}>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => window.open(url!, '_blank')}
-                  >
-                    <Icon className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  {label}
-                </TooltipContent>
-              </Tooltip>
-            ))}
+            {socialLinks.length > 0 ? (
+              socialLinks.map(({ url, icon: Icon, label }) => (
+                <Tooltip key={url}>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => window.open(url!, '_blank')}
+                    >
+                      <Icon className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {label}
+                  </TooltipContent>
+                </Tooltip>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground italic py-2">
+                No social links
+              </p>
+            )}
           </div>
           <div className="flex space-x-2">
             <Tooltip>

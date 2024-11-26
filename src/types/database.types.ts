@@ -6,6 +6,8 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
+export type UserRole = 'user' | 'admin' | 'moderator';
+
 export interface Database {
   public: {
     Tables: {
@@ -24,6 +26,9 @@ export interface Database {
           linkedin_url: string | null
           twitter_url: string | null
           website_url: string | null
+          categories: string[] | null
+          role: UserRole
+          email: string | null
         }
         Insert: {
           id: string
@@ -39,6 +44,9 @@ export interface Database {
           linkedin_url?: string | null
           twitter_url?: string | null
           website_url?: string | null
+          categories?: string[] | null
+          role?: UserRole
+          email?: string | null
         }
         Update: {
           id?: string
@@ -54,6 +62,9 @@ export interface Database {
           linkedin_url?: string | null
           twitter_url?: string | null
           website_url?: string | null
+          categories?: string[] | null
+          role?: UserRole
+          email?: string | null
         }
       }
       skills: {
@@ -100,9 +111,45 @@ export interface Database {
           created_at?: string
         }
       }
+      categories: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          created_at: string
+          is_active: boolean
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          created_at?: string
+          is_active?: boolean
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          created_at?: string
+          is_active?: boolean
+        }
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      is_admin: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
+    }
+    Enums: {
+      user_role: UserRole
     }
   }
 }
 
 export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
-export type Enums<T extends keyof Database['public']['Enums']> = Database['public']['Enums'][T] 
+export type Enums<T extends keyof Database['public']['Enums']> = Database['public']['Enums'][T]
+export type Functions<T extends keyof Database['public']['Functions']> = Database['public']['Functions'][T] 

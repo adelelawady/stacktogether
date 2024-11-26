@@ -8,8 +8,12 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
+import AllUsers from "./pages/AllUsers";
+import Categories from "./pages/Categories";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 
 const queryClient = new QueryClient();
+const basename = import.meta.env.DEV ? '' : '/stacktogether';
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -17,12 +21,15 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
+        <BrowserRouter basename={basename}>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/all-users" element={<AllUsers />} />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/admin" element={<AdminDashboard />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
