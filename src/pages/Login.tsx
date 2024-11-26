@@ -97,7 +97,7 @@ const Login = () => {
         description: "Logged in successfully!",
       });
       
-      navigate("/login");
+      navigate("/");
     } catch (error) {
       toast({
         variant: "destructive",

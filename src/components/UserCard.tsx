@@ -128,8 +128,8 @@ const UserCard = ({
               No bio provided
             </p>
           )}
-          
-          {categories && categories.length > 0 && (
+           {/* 
+          {categories  && categories.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {categories.map((category) => (
                 <Badge key={category} variant="secondary" className="capitalize">
@@ -138,7 +138,7 @@ const UserCard = ({
               ))}
             </div>
           )}
-          
+           */}
           <div className="flex flex-wrap gap-2">
             {skills.length > 0 ? (
               skills.map((skill) => (
