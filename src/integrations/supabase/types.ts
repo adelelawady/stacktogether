@@ -45,6 +45,30 @@ export type Database = {
           },
         ]
       }
+      categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+        }
+        Relationships: []
+      }
       endorsements: {
         Row: {
           created_at: string
@@ -85,31 +109,234 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
+          categories: string[] | null
           created_at: string
           full_name: string | null
+          github_url: string | null
           id: string
+          linkedin_url: string | null
           location: string | null
+          role: Database["public"]["Enums"]["user_role"] | null
+          title: string | null
+          twitter_url: string | null
           updated_at: string
+          website_url: string | null
+          years_of_experience: number | null
         }
         Insert: {
           avatar_url?: string | null
           bio?: string | null
+          categories?: string[] | null
           created_at?: string
           full_name?: string | null
+          github_url?: string | null
           id: string
+          linkedin_url?: string | null
           location?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          title?: string | null
+          twitter_url?: string | null
           updated_at?: string
+          website_url?: string | null
+          years_of_experience?: number | null
         }
         Update: {
           avatar_url?: string | null
           bio?: string | null
+          categories?: string[] | null
           created_at?: string
           full_name?: string | null
+          github_url?: string | null
           id?: string
+          linkedin_url?: string | null
           location?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          title?: string | null
+          twitter_url?: string | null
           updated_at?: string
+          website_url?: string | null
+          years_of_experience?: number | null
         }
         Relationships: []
+      }
+      project_join_requests: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          profile_id: string | null
+          project_id: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          profile_id?: string | null
+          project_id?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          profile_id?: string | null
+          project_id?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_join_requests_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_join_requests_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_members: {
+        Row: {
+          created_at: string
+          id: string
+          profile_id: string | null
+          project_id: string | null
+          role: Database["public"]["Enums"]["project_role"]
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          profile_id?: string | null
+          project_id?: string | null
+          role?: Database["public"]["Enums"]["project_role"]
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          profile_id?: string | null
+          project_id?: string | null
+          role?: Database["public"]["Enums"]["project_role"]
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_members_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_members_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_skills: {
+        Row: {
+          created_at: string
+          id: string
+          project_id: string | null
+          skill_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          skill_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          skill_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_skills_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_skills_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          categories: string[] | null
+          code_url: string | null
+          content: string | null
+          created_at: string
+          demo_url: string | null
+          description: string | null
+          id: string
+          is_public: boolean | null
+          name: string
+          owner_id: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          categories?: string[] | null
+          code_url?: string | null
+          content?: string | null
+          created_at?: string
+          demo_url?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          name: string
+          owner_id?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          categories?: string[] | null
+          code_url?: string | null
+          content?: string | null
+          created_at?: string
+          demo_url?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          name?: string
+          owner_id?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projects_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       skills: {
         Row: {
@@ -208,10 +435,41 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_project_role: {
+        Args: {
+          project_id: string
+          user_id: string
+        }
+        Returns: Database["public"]["Enums"]["project_role"]
+      }
+      is_admin: {
+        Args: {
+          userid: string
+        }
+        Returns: boolean
+      }
+      is_project_member: {
+        Args: {
+          project_id: string
+          user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      project_role: "owner" | "admin" | "moderator" | "member"
+      user_category:
+        | "frontend"
+        | "backend"
+        | "fullstack"
+        | "mobile"
+        | "devops"
+        | "database"
+        | "cloud"
+        | "security"
+        | "ai_ml"
+        | "blockchain"
+      user_role: "user" | "admin" | "moderator"
     }
     CompositeTypes: {
       [_ in never]: never
