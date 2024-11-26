@@ -130,31 +130,36 @@ const ProjectForm = () => {
         });
       } else {
         // Create new project
-        const { data, error } = await supabase
+        const { data: newProject, error: projectError } = await supabase
           .from('projects')
           .insert([projectData])
           .select()
           .single();
 
-        if (error) throw error;
+        if (projectError) throw projectError;
 
         // Create owner as first member
-        await supabase
+        const { error: memberError } = await supabase
           .from('project_members')
           .insert({
-            project_id: data.id,
+            project_id: newProject.id,
             profile_id: user.id,
             role: 'owner',
-            status: 'approved',
+            status: 'approved'
           });
+
+        if (memberError) throw memberError;
 
         toast({
           title: "Success",
           description: "Project created successfully!",
         });
+
+        navigate(`/projects/${newProject.id}`);
+        return;
       }
 
-      navigate(`/projects/${projectId || ''}`);
+      navigate(`/projects/${projectId}`);
     } catch (error) {
       console.error('Error saving project:', error);
       toast({
