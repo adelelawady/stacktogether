@@ -47,10 +47,10 @@ const UserCard = ({
   onConnect 
 }: UserCardProps) => {
   const socialLinks = [
-    { url: github_url, icon: Github, label: "GitHub" },
-    { url: linkedin_url, icon: Linkedin, label: "LinkedIn" },
-    { url: twitter_url, icon: Twitter, label: "Twitter" },
-    { url: website_url, icon: Globe, label: "Website" },
+    { url: github_url, icon: Github, label: "GitHub", platform: 'github' },
+    { url: linkedin_url, icon: Linkedin, label: "LinkedIn", platform: 'linkedin' },
+    { url: twitter_url, icon: Twitter, label: "Twitter", platform: 'twitter' },
+    { url: website_url, icon: Globe, label: "Website", platform: 'website' },
   ].filter(link => link.url);
 
   const displayName = full_name || "Anonymous User";
@@ -153,8 +153,8 @@ const UserCard = ({
         <CardFooter className="flex justify-between mt-auto pt-6 border-t">
           <div className="flex space-x-2">
             {socialLinks.length > 0 ? (
-              socialLinks.map(({ url, icon: Icon, label }) => (
-                <Tooltip key={url}>
+              socialLinks.map(({ url, icon: Icon, label, platform }) => (
+                <Tooltip key={`${platform}-${url}`}>
                   <TooltipTrigger asChild>
                     <Button
                       variant="ghost"

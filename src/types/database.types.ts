@@ -7,6 +7,9 @@ export type Json =
   | Json[]
 
 export type UserRole = 'user' | 'admin' | 'moderator';
+export type ProjectRole = 'owner' | 'admin' | 'moderator' | 'member';
+export type ProjectStatus = 'active' | 'archived' | 'draft';
+export type JoinRequestStatus = 'pending' | 'approved' | 'rejected';
 
 export interface Database {
   public: {
@@ -65,6 +68,128 @@ export interface Database {
           categories?: string[] | null
           role?: UserRole
           email?: string | null
+        }
+      }
+      projects: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          content: string | null
+          code_url: string | null
+          demo_url: string | null
+          status: ProjectStatus
+          created_at: string
+          updated_at: string
+          owner_id: string
+          categories: string[] | null
+          is_public: boolean
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          content?: string | null
+          code_url?: string | null
+          demo_url?: string | null
+          status?: ProjectStatus
+          created_at?: string
+          updated_at?: string
+          owner_id: string
+          categories?: string[] | null
+          is_public?: boolean
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          content?: string | null
+          code_url?: string | null
+          demo_url?: string | null
+          status?: ProjectStatus
+          created_at?: string
+          updated_at?: string
+          owner_id?: string
+          categories?: string[] | null
+          is_public?: boolean
+        }
+      }
+      project_members: {
+        Row: {
+          id: string
+          project_id: string
+          profile_id: string
+          role: ProjectRole
+          status: JoinRequestStatus
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          profile_id: string
+          role?: ProjectRole
+          status?: JoinRequestStatus
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          profile_id?: string
+          role?: ProjectRole
+          status?: JoinRequestStatus
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      project_skills: {
+        Row: {
+          id: string
+          project_id: string
+          skill_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          skill_id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          skill_id?: string
+          created_at?: string
+        }
+      }
+      project_join_requests: {
+        Row: {
+          id: string
+          project_id: string
+          profile_id: string
+          message: string | null
+          status: JoinRequestStatus
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          profile_id: string
+          message?: string | null
+          status?: JoinRequestStatus
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          profile_id?: string
+          message?: string | null
+          status?: JoinRequestStatus
+          created_at?: string
+          updated_at?: string
         }
       }
       skills: {
@@ -146,10 +271,26 @@ export interface Database {
     }
     Enums: {
       user_role: UserRole
+      project_role: ProjectRole
+      project_status: ProjectStatus
+      join_request_status: JoinRequestStatus
     }
   }
 }
 
 export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
 export type Enums<T extends keyof Database['public']['Enums']> = Database['public']['Enums'][T]
-export type Functions<T extends keyof Database['public']['Functions']> = Database['public']['Functions'][T] 
+export type Functions<T extends keyof Database['public']['Functions']> = Database['public']['Functions'][T]
+
+// Helper type for project with related data
+export interface ProjectWithDetails extends Database['public']['Tables']['projects']['Row'] {
+  members: (Database['public']['Tables']['project_members']['Row'] & {
+    profile: Database['public']['Tables']['profiles']['Row']
+  })[];
+  skills: (Database['public']['Tables']['project_skills']['Row'] & {
+    skill: Database['public']['Tables']['skills']['Row']
+  })[];
+  join_requests: (Database['public']['Tables']['project_join_requests']['Row'] & {
+    profile: Database['public']['Tables']['profiles']['Row']
+  })[];
+} 

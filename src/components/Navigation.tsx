@@ -52,6 +52,7 @@ const Navigation = () => {
 
   const navItems = [
     { path: "/", label: "Home" },
+    { path: "/projects", label: "Projects", icon: Grid },
     { path: "/all-users", label: "All Developers", icon: Users },
     { path: "/categories", label: "Categories", icon: Grid },
     ...(profile?.role === 'admin' ? [

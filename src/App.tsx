@@ -11,6 +11,8 @@ import Profile from "./pages/Profile";
 import AllUsers from "./pages/AllUsers";
 import Categories from "./pages/Categories";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import ProjectList from "./pages/projects/ProjectList";
+import ProjectForm from "./pages/projects/ProjectForm";
 
 const queryClient = new QueryClient();
 const basename = import.meta.env.DEV ? '' : '/stacktogether';
@@ -30,6 +32,9 @@ const App = () => (
             <Route path="/all-users" element={<AllUsers />} />
             <Route path="/categories" element={<Categories />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/projects" element={<ProjectList />} />
+            <Route path="/projects/new" element={<ProjectForm />} />
+            <Route path="/projects/:projectId/edit" element={<ProjectForm />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>

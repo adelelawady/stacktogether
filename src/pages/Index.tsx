@@ -5,6 +5,8 @@ import UserCard from "@/components/UserCard";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/types/database.types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type Skill = Database['public']['Tables']['skills']['Row'];
@@ -16,6 +18,7 @@ interface ProfileWithSkills extends Profile {
 }
 
 const Index = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState<ProfileWithSkills[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -52,6 +55,10 @@ const Index = () => {
   const handleConnect = (userId: string) => {
     // TODO: Implement connect functionality
     console.log("Connecting with user:", userId);
+  };
+
+  const handleCategoryClick = (category: string) => {
+    navigate(`/categories?filter=${encodeURIComponent(category)}`);
   };
 
   // Group users by categories
@@ -128,19 +135,22 @@ const Index = () => {
 
         <div className="space-y-12">
           {Object.entries(usersByCategory)
-            .filter(([_, users]) => users.length > 0) // Only show categories with users
+            .filter(([_, users]) => users.length > 0)
             .map(([category, categoryUsers]) => (
               <section key={category} className="space-y-6">
-                <div className="flex items-center justify-between">
+                <div 
+                  className="flex items-center justify-between cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => handleCategoryClick(category)}
+                >
                   <h2 className="text-2xl font-semibold text-gray-900 capitalize">
                     {category.replace('_', ' ')}
                   </h2>
                   <span className="text-sm text-gray-500">
-                    {categoryUsers.length} developer{categoryUsers.length !== 1 ? 's' : ''}
+                    {categoryUsers.length} developer{categoryUsers.length !== 1 ? 's' : ''} →
                   </span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {categoryUsers.map((user) => (
+                  {categoryUsers.slice(0, 3).map((user) => (
                     <UserCard
                       key={`${category}-${user.id}`}
                       {...user}
@@ -149,6 +159,16 @@ const Index = () => {
                     />
                   ))}
                 </div>
+                {categoryUsers.length > 3 && (
+                  <div className="text-center">
+                    <Button
+                      variant="outline"
+                      onClick={() => handleCategoryClick(category)}
+                    >
+                      View all {categoryUsers.length} developers in {category.replace('_', ' ')}
+                    </Button>
+                  </div>
+                )}
               </section>
             ))}
         </div>

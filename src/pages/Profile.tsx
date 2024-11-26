@@ -23,8 +23,20 @@ import { CategorySelect } from "@/components/CategorySelect";
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type Skill = Database['public']['Tables']['skills']['Row'];
 type UserSkill = Database['public']['Tables']['user_skills']['Row'];
+type Category = Database['public']['Tables']['categories']['Row'];
 
-interface ProfileFormData extends Omit<Profile, 'id' | 'created_at' | 'updated_at'> {}
+interface ProfileFormData {
+  full_name: string;
+  title: string | null;
+  bio: string | null;
+  location: string | null;
+  years_of_experience: number | null;
+  github_url: string | null;
+  linkedin_url: string | null;
+  twitter_url: string | null;
+  website_url: string | null;
+  categories: string[];
+}
 
 const Profile = () => {
   const { profile, user } = useAuth();
@@ -34,22 +46,19 @@ const Profile = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [availableSkills, setAvailableSkills] = useState<Skill[]>([]);
   const [userSkills, setUserSkills] = useState<UserSkill[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState<ProfileFormData>({
     full_name: '',
     title: '',
     bio: '',
     location: '',
-    avatar_url: '',
     years_of_experience: 0,
     github_url: '',
     linkedin_url: '',
     twitter_url: '',
     website_url: '',
     categories: [],
-    role: 'user',
-    email: ''
   });
-  const [categories, setCategories] = useState<Database['public']['Tables']['categories']['Row'][]>([]);
 
   useEffect(() => {
     if (profile) {
@@ -58,15 +67,12 @@ const Profile = () => {
         title: profile.title || '',
         bio: profile.bio || '',
         location: profile.location || '',
-        avatar_url: profile.avatar_url || '',
         years_of_experience: profile.years_of_experience || 0,
         github_url: profile.github_url || '',
         linkedin_url: profile.linkedin_url || '',
         twitter_url: profile.twitter_url || '',
         website_url: profile.website_url || '',
         categories: profile.categories || [],
-        role: profile.role,
-        email: profile.email || ''
       });
     }
   }, [profile]);
@@ -80,6 +86,7 @@ const Profile = () => {
         const { data: categoriesData } = await supabase
           .from('categories')
           .select('*')
+          .eq('is_active', true)
           .order('name');
 
         if (categoriesData) {
@@ -108,6 +115,11 @@ const Profile = () => {
         }
       } catch (error) {
         console.error('Error loading data:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load profile data",
+        });
       } finally {
         setIsLoading(false);
       }
@@ -122,7 +134,17 @@ const Profile = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value === "" ? null : value,
+    }));
+  };
+
+  const handleNumberChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value === "" ? null : Number(value),
     }));
   };
 
@@ -161,16 +183,9 @@ const Profile = () => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update skills. Please try again.",
+        description: "Failed to update skills",
       });
     }
-  };
-
-  const handleCategoryChange = (selectedCategories: string[]) => {
-    setFormData(prev => ({
-      ...prev,
-      categories: selectedCategories,
-    }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -194,10 +209,11 @@ const Profile = () => {
         description: "Profile updated successfully!",
       });
     } catch (error) {
+      console.error('Error updating profile:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update profile. Please try again.",
+        description: "Failed to update profile",
       });
     } finally {
       setIsSaving(false);
@@ -245,7 +261,7 @@ const Profile = () => {
                   <Input
                     id="title"
                     name="title"
-                    value={formData.title}
+                    value={formData.title || ''}
                     onChange={handleInputChange}
                     placeholder="Full Stack Developer"
                   />
@@ -256,7 +272,7 @@ const Profile = () => {
                   <Input
                     id="location"
                     name="location"
-                    value={formData.location}
+                    value={formData.location || ''}
                     onChange={handleInputChange}
                     placeholder="City, Country"
                   />
@@ -268,8 +284,8 @@ const Profile = () => {
                     id="years_of_experience"
                     name="years_of_experience"
                     type="number"
-                    value={formData.years_of_experience}
-                    onChange={handleInputChange}
+                    value={formData.years_of_experience || ''}
+                    onChange={handleNumberChange}
                     min="0"
                   />
                 </div>
@@ -279,7 +295,7 @@ const Profile = () => {
                   <Textarea
                     id="bio"
                     name="bio"
-                    value={formData.bio}
+                    value={formData.bio || ''}
                     onChange={handleInputChange}
                     placeholder="Tell us about yourself..."
                     rows={4}
@@ -291,7 +307,7 @@ const Profile = () => {
                   <Input
                     id="github_url"
                     name="github_url"
-                    value={formData.github_url}
+                    value={formData.github_url || ''}
                     onChange={handleInputChange}
                     placeholder="https://github.com/username"
                   />
@@ -302,7 +318,7 @@ const Profile = () => {
                   <Input
                     id="linkedin_url"
                     name="linkedin_url"
-                    value={formData.linkedin_url}
+                    value={formData.linkedin_url || ''}
                     onChange={handleInputChange}
                     placeholder="https://linkedin.com/in/username"
                   />
@@ -313,7 +329,7 @@ const Profile = () => {
                   <Input
                     id="twitter_url"
                     name="twitter_url"
-                    value={formData.twitter_url}
+                    value={formData.twitter_url || ''}
                     onChange={handleInputChange}
                     placeholder="https://twitter.com/username"
                   />
@@ -324,7 +340,7 @@ const Profile = () => {
                   <Input
                     id="website_url"
                     name="website_url"
-                    value={formData.website_url}
+                    value={formData.website_url || ''}
                     onChange={handleInputChange}
                     placeholder="https://yourwebsite.com"
                   />
@@ -338,8 +354,8 @@ const Profile = () => {
                 </p>
                 <CategorySelect
                   categories={categories}
-                  selectedCategories={formData.categories || []}
-                  onChange={handleCategoryChange}
+                  selectedCategories={formData.categories}
+                  onChange={(categories) => setFormData(prev => ({ ...prev, categories }))}
                 />
               </div>
 

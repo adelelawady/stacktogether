@@ -5,8 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UsersManagement } from "./tabs/UsersManagement";
 import { CategoriesManagement } from "./tabs/CategoriesManagement";
 import { SkillsManagement } from "./tabs/SkillsManagement";
+import { MembersManagement } from "./tabs/MembersManagement";
+import { JoinRequestsManagement } from "./tabs/JoinRequestsManagement";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
+import { ProjectsManagement } from "./tabs/ProjectsManagement";
 
 const AdminDashboard = () => {
   const { profile } = useAuth();
@@ -27,19 +30,27 @@ const AdminDashboard = () => {
           </CardHeader>
           <CardContent>
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="users">Users</TabsTrigger>
+                <TabsTrigger value="projects">Projects</TabsTrigger>
+                <TabsTrigger value="members">Members</TabsTrigger>
+                <TabsTrigger value="requests">Join Requests</TabsTrigger>
                 <TabsTrigger value="categories">Categories</TabsTrigger>
-                <TabsTrigger value="skills">Skills</TabsTrigger>
               </TabsList>
               <TabsContent value="users">
                 <UsersManagement />
               </TabsContent>
+              <TabsContent value="projects">
+                <ProjectsManagement />
+              </TabsContent>
+              <TabsContent value="members">
+                <MembersManagement />
+              </TabsContent>
+              <TabsContent value="requests">
+                <JoinRequestsManagement />
+              </TabsContent>
               <TabsContent value="categories">
                 <CategoriesManagement />
-              </TabsContent>
-              <TabsContent value="skills">
-                <SkillsManagement />
               </TabsContent>
             </Tabs>
           </CardContent>
