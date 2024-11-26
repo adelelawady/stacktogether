@@ -20,6 +20,7 @@ import { ProjectLinks } from "@/components/projects/ProjectLinks";
 import { ProjectSettings } from "@/components/projects/ProjectSettings";
 import type { Category } from "@/types/database.types";
 import type { ProjectFormData, Project } from "@/types/project.types";
+import { Label } from "@/components/ui/label";
 
 const ProjectForm = () => {
   const { projectId } = useParams();
