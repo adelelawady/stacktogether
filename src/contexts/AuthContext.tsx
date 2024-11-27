@@ -112,25 +112,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
+      // First, sign out from Supabase
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
       // Clear all local storage data
-      localStorage.clear();
+      window.localStorage.clear();
       
       // Reset all state
       setSession(null);
       setUser(null);
       setProfile(null);
       
-      // Clear supabase session
+      // Clear Supabase internal storage
       await supabase.auth.clearSession();
       
       // Clear any cached data
-      queryClient.clear();
+      if (window.location.hostname === 'localhost') {
+        // In development, also clear IndexedDB
+        const databases = await window.indexedDB.databases();
+        databases.forEach(db => {
+          if (db.name) window.indexedDB.deleteDatabase(db.name);
+        });
+      }
       
     } catch (error) {
       console.error('Error signing out:', error);
+      
+      // Even if there's an error, clear everything to ensure clean state
+      window.localStorage.clear();
+      setSession(null);
+      setUser(null);
+      setProfile(null);
+      
       throw error;
     }
   };
