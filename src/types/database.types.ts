@@ -263,6 +263,215 @@ export interface Database {
           is_active?: boolean
         }
       }
+      task_lists: {
+        Row: {
+          id: string;
+          project_id: string;
+          name: string;
+          type: string;
+          position: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          project_id: string;
+          name: string;
+          type: string;
+          position?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          project_id?: string;
+          name?: string;
+          type?: string;
+          position?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "task_lists_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+
+      tasks: {
+        Row: {
+          id: string;
+          list_id: string;
+          project_id: string;
+          title: string;
+          description: string | null;
+          priority: 'low' | 'medium' | 'high' | 'urgent';
+          status: 'todo' | 'in_progress' | 'review' | 'done';
+          position: number;
+          due_date: string | null;
+          created_by: string;
+          assigned_to: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          list_id: string;
+          project_id: string;
+          title: string;
+          description?: string | null;
+          priority?: 'low' | 'medium' | 'high' | 'urgent';
+          status?: 'todo' | 'in_progress' | 'review' | 'done';
+          position?: number;
+          due_date?: string | null;
+          created_by: string;
+          assigned_to?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          list_id?: string;
+          project_id?: string;
+          title?: string;
+          description?: string | null;
+          priority?: 'low' | 'medium' | 'high' | 'urgent';
+          status?: 'todo' | 'in_progress' | 'review' | 'done';
+          position?: number;
+          due_date?: string | null;
+          created_by?: string;
+          assigned_to?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "tasks_list_id_fkey";
+            columns: ["list_id"];
+            isOneToOne: false;
+            referencedRelation: "task_lists";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "tasks_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "tasks_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "tasks_assigned_to_fkey";
+            columns: ["assigned_to"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+
+      comments: {
+        Row: {
+          id: string;
+          task_id: string;
+          content: string;
+          created_by: string;
+          parent_id: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          task_id: string;
+          content: string;
+          created_by: string;
+          parent_id?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          task_id?: string;
+          content?: string;
+          created_by?: string;
+          parent_id?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "comments_task_id_fkey";
+            columns: ["task_id"];
+            isOneToOne: false;
+            referencedRelation: "tasks";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "comments_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "comments_parent_id_fkey";
+            columns: ["parent_id"];
+            isOneToOne: false;
+            referencedRelation: "comments";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+
+      comment_reactions: {
+        Row: {
+          id: string;
+          comment_id: string;
+          created_by: string;
+          type: 'like' | 'love' | 'laugh' | 'angry' | 'sad';
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          comment_id: string;
+          created_by: string;
+          type: 'like' | 'love' | 'laugh' | 'angry' | 'sad';
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          comment_id?: string;
+          created_by?: string;
+          type?: 'like' | 'love' | 'laugh' | 'angry' | 'sad';
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "comment_reactions_comment_id_fkey";
+            columns: ["comment_id"];
+            isOneToOne: false;
+            referencedRelation: "comments";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "comment_reactions_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
     }
     Views: {
       [_ in never]: never

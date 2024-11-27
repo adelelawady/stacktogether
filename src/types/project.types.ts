@@ -30,4 +30,32 @@ export interface ProjectFormData {
   status: ProjectStatus;
   categories: string[];
   is_public: boolean;
-} 
+}
+
+export type TaskListType = 'todo' | 'in_progress' | 'review' | 'done' | 'backlog';
+export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
+export type TaskStatus = 'todo' | 'in_progress' | 'review' | 'done';
+
+export type TaskList = Database['public']['Tables']['task_lists']['Row'];
+export type Task = Database['public']['Tables']['tasks']['Row'];
+export type Comment = Database['public']['Tables']['comments']['Row'] & {
+  profile: Database['public']['Tables']['profiles']['Row'];
+  comment_reactions: CommentReaction[];
+  replies?: Comment[];
+};
+export type CommentReaction = Database['public']['Tables']['comment_reactions']['Row'] & {
+  profile: Database['public']['Tables']['profiles']['Row'];
+};
+
+export interface TaskWithDetails extends Task {
+  created_by_profile: Database['public']['Tables']['profiles']['Row'];
+  assigned_to_profile?: Database['public']['Tables']['profiles']['Row'];
+  comments: Comment[];
+}
+
+export interface TaskListWithDetails extends TaskList {
+  tasks: TaskWithDetails[];
+}
+
+export type CommentSortOption = 'newest' | 'oldest' | 'most_reactions';
+ 

@@ -1,24 +1,23 @@
-import MDEditor from "@uiw/react-md-editor";
-import { Label } from "@/components/ui/label";
-import { ProjectFormData } from "@/types/project.types";
+import { MDXEditor } from "@/components/ui/mdx-editor";
 
 interface ProjectContentProps {
-  content: string;
-  onChange: (value: string | undefined) => void;
+  content?: string;
+  onChange?: (content: string) => void;
 }
 
-export const ProjectContent = ({ content, onChange }: ProjectContentProps) => {
+export function ProjectContent({ content = '', onChange }: ProjectContentProps) {
   return (
-    <div className="space-y-2">
-      <Label>Project Content</Label>
-      <div data-color-mode="light">
-        <MDEditor
-          value={content}
-          onChange={(value) => onChange(value)}
-          preview="edit"
-          height={400}
-        />
-      </div>
+    <div className="w-full max-w-none">
+      {content ? (
+        <div className="prose prose-sm sm:prose lg:prose-lg max-w-none dark:prose-invert">
+          <MDXEditor.Preview source={content} />
+        </div>
+      ) : (
+        <div className="text-center py-12 text-muted-foreground">
+          <p className="text-lg">No documentation available for this project.</p>
+          <p className="text-sm mt-2">Documentation helps others understand your project better.</p>
+        </div>
+      )}
     </div>
   );
-};
+}
