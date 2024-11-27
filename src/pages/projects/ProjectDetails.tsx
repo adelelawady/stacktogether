@@ -43,7 +43,10 @@ const ProjectDetails = () => {
   const [taskLists, setTaskLists] = useState<TaskListWithDetails[]>([]);
 
   useEffect(() => {
-    loadProject();
+    if (projectId) {
+      loadProject();
+      loadTaskLists();
+    }
   }, [projectId]);
 
   const loadProject = async () => {
@@ -83,12 +86,68 @@ const ProjectDetails = () => {
     setIsLoading(false);
   };
 
+  const loadTaskLists = async () => {
+    if (!projectId) return;
+
+    const { data: lists, error: listsError } = await supabase
+      .from('task_lists')
+      .select(`
+        *,
+        tasks(
+          *,
+          created_by_profile:profiles!tasks_created_by_fkey(*),
+          assigned_to_profile:profiles!tasks_assigned_to_fkey(*)
+        )
+      `)
+      .eq('project_id', projectId)
+      .order('position');
+
+    if (listsError) {
+      console.error('Error loading task lists:', listsError);
+      return;
+    }
+
+    setTaskLists(lists || []);
+  };
+
   const isProjectMember = project?.members.some(
     member => member.profile_id === user?.id
   );
 
   const handleTaskListsUpdate = (lists: TaskListWithDetails[]) => {
     setTaskLists(lists);
+  };
+
+  // Helper functions for task calculations
+  const calculateTaskStats = () => {
+    if (!taskLists) return { total: 0, todo: 0, inProgress: 0, completed: 0 };
+    
+    return taskLists.reduce((acc, list) => {
+      const tasks = list.tasks || [];
+      const todoTasks = tasks.filter(t => t.status === 'todo' || list.type === 'todo').length;
+      const inProgressTasks = tasks.filter(t => 
+        t.status === 'in_progress' || 
+        list.type === 'in_progress' || 
+        t.status === 'review' || 
+        list.type === 'review'
+      ).length;
+      const completedTasks = tasks.filter(t => t.status === 'done' || list.type === 'done').length;
+      
+      return {
+        total: acc.total + tasks.length,
+        todo: acc.todo + todoTasks,
+        inProgress: acc.inProgress + inProgressTasks,
+        completed: acc.completed + completedTasks
+      };
+    }, { total: 0, todo: 0, inProgress: 0, completed: 0 });
+  };
+
+  const calculateProgress = () => {
+    const stats = calculateTaskStats();
+    if (stats.total === 0) return 0;
+    // Include both in progress and completed tasks in the progress calculation
+    const progressTasks = stats.inProgress * 0.5 + stats.completed;
+    return Math.round((progressTasks / stats.total) * 100);
   };
 
   if (isLoading) {
@@ -339,20 +398,10 @@ const ProjectDetails = () => {
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Overall Progress</span>
                     <span className="font-medium">
-                      {Math.round((taskLists?.reduce((acc, list) => 
-                        acc + list.tasks.filter(t => t.status === 'done').length, 0
-                      ) / taskLists?.reduce((acc, list) => 
-                        acc + list.tasks.length, 0
-                      ) || 0) * 100)}%
+                      {calculateProgress()}%
                     </span>
                   </div>
-                  <Progress 
-                    value={Math.round((taskLists?.reduce((acc, list) => 
-                      acc + list.tasks.filter(t => t.status === 'done').length, 0
-                    ) / taskLists?.reduce((acc, list) => 
-                      acc + list.tasks.length, 0
-                    ) || 0) * 100)} 
-                  />
+                  <Progress value={calculateProgress()} />
                 </div>
 
                 <div className="space-y-3">
@@ -362,9 +411,7 @@ const ProjectDetails = () => {
                       <span>To Do</span>
                     </div>
                     <span className="font-medium">
-                      {taskLists?.reduce((acc, list) => 
-                        acc + list.tasks.filter(t => t.status === 'todo').length, 0
-                      ) || 0}
+                      {calculateTaskStats().todo}
                     </span>
                   </div>
 
@@ -374,11 +421,7 @@ const ProjectDetails = () => {
                       <span>In Progress</span>
                     </div>
                     <span className="font-medium">
-                      {taskLists?.reduce((acc, list) => 
-                        acc + list.tasks.filter(t => 
-                          t.status === 'in_progress' || t.status === 'review'
-                        ).length, 0
-                      ) || 0}
+                      {calculateTaskStats().inProgress}
                     </span>
                   </div>
 
@@ -388,9 +431,7 @@ const ProjectDetails = () => {
                       <span>Completed</span>
                     </div>
                     <span className="font-medium">
-                      {taskLists?.reduce((acc, list) => 
-                        acc + list.tasks.filter(t => t.status === 'done').length, 0
-                      ) || 0}
+                      {calculateTaskStats().completed}
                     </span>
                   </div>
                 </div>
