@@ -8,13 +8,14 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, User2, ArrowLeft } from "lucide-react";
+import { Calendar, User2, ArrowLeft, X, Edit, Save, Loader2 } from "lucide-react";
 import { getAvatarUrl } from "@/lib/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { TaskComment } from "@/components/projects/TaskComment";
 import type { TaskWithDetails, CommentSortOption } from "@/types/project.types";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { MDXEditor } from "@/components/ui/mdx-editor";
 
 const TaskDetails = () => {
   const { projectId, taskId } = useParams();
@@ -79,25 +80,25 @@ const TaskDetails = () => {
 
   const handleDescriptionSave = async () => {
     if (!task) return;
-
     setIsSubmitting(true);
+
     const { error } = await supabase
       .from('tasks')
       .update({ description })
       .eq('id', task.id);
 
     setIsSubmitting(false);
+    setIsEditing(false);
 
     if (error) {
       toast({
-        title: "Error",
-        description: "Failed to update task description",
         variant: "destructive",
+        title: "Error",
+        description: "Failed to update description",
       });
       return;
     }
 
-    setIsEditing(false);
     loadTask();
   };
 
@@ -204,37 +205,80 @@ const TaskDetails = () => {
           <CardContent className="space-y-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Description</h3>
+                <h3 className="text-lg font-medium">Description</h3>
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
                   onClick={() => setIsEditing(!isEditing)}
                 >
-                  {isEditing ? "Cancel" : "Edit"}
+                  {isEditing ? (
+                    <>
+                      <X className="h-4 w-4 mr-2" />
+                      Cancel
+                    </>
+                  ) : (
+                    <>
+                      <Edit className="h-4 w-4 mr-2" />
+                      Edit
+                    </>
+                  )}
                 </Button>
               </div>
 
               {isEditing ? (
-                <div className="space-y-2">
-                  <Textarea
+                <Card className="p-4">
+                  <MDXEditor
                     value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Write task description..."
-                    rows={5}
+                    onChange={setDescription}
+                    placeholder="Write a description..."
+                    className="min-h-[300px]"
+                    minHeight={300}
                   />
-                  <div className="flex justify-end">
+                  <div className="flex justify-end gap-2 mt-4">
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        setIsEditing(false);
+                        setDescription(task?.description || '');
+                      }}
+                      disabled={isSubmitting}
+                    >
+                      Cancel
+                    </Button>
                     <Button
                       onClick={handleDescriptionSave}
                       disabled={isSubmitting}
                     >
-                      Save Changes
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="h-4 w-4 mr-2" />
+                          Save
+                        </>
+                      )}
                     </Button>
                   </div>
-                </div>
+                </Card>
               ) : (
-                <div className="whitespace-pre-wrap">
-                  {task.description || 'No description provided.'}
-                </div>
+                <Card className="p-4">
+                  {description ? (
+                    <div className="prose prose-sm max-w-none">
+                      <MDXEditor
+                        value={description}
+                        readOnly
+                        className="prose prose-sm max-w-none"
+                      />
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground text-sm">
+                      No description provided
+                    </p>
+                  )}
+                </Card>
               )}
             </div>
 

@@ -1,0 +1,112 @@
+@import '@mdxeditor/editor/style.css';
+
+/* Add custom styles for the editor */
+.mdxeditor {
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  background-color: hsl(var(--background));
+}
+
+.mdxeditor-toolbar {
+  border-bottom: 1px solid hsl(var(--border));
+  background-color: hsl(var(--muted));
+}
+
+.mdxeditor-toolbar button {
+  color: hsl(var(--foreground));
+}
+
+.mdxeditor-toolbar button:hover {
+  background-color: hsl(var(--muted-foreground/0.1));
+}
+
+/* Markdown Editor Styles */
+.markdown-body {
+  background-color: transparent !important;
+}
+
+.w-md-editor {
+  background-color: hsl(var(--background)) !important;
+  border-color: hsl(var(--border)) !important;
+  box-shadow: none !important;
+}
+
+.w-md-editor-toolbar {
+  border-color: hsl(var(--border)) !important;
+  background-color: hsl(var(--muted)) !important;
+  padding: 8px !important;
+}
+
+.w-md-editor-toolbar ul > li > button {
+  color: hsl(var(--foreground)) !important;
+  margin: 0 2px !important;
+}
+
+.w-md-editor-toolbar ul > li > button:hover {
+  background-color: hsl(var(--muted-foreground/0.1)) !important;
+}
+
+.w-md-editor-text {
+  background-color: transparent !important;
+  padding: 16px !important;
+}
+
+.w-md-editor-text-pre, 
+.w-md-editor-text-input,
+.w-md-editor-text-pre > code {
+  color: hsl(var(--foreground)) !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+}
+
+.wmde-markdown {
+  background-color: transparent !important;
+  font-size: 14px !important;
+  padding: 16px !important;
+}
+
+.wmde-markdown h1,
+.wmde-markdown h2,
+.wmde-markdown h3,
+.wmde-markdown h4 {
+  border-bottom: 1px solid hsl(var(--border));
+  padding-bottom: 0.3em;
+  margin-top: 1.5em;
+  margin-bottom: 1em;
+}
+
+.wmde-markdown code {
+  background-color: hsl(var(--muted));
+  border-radius: 3px;
+  padding: 0.2em 0.4em;
+}
+
+.wmde-markdown pre {
+  background-color: hsl(var(--muted)) !important;
+  border: 1px solid hsl(var(--border));
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.wmde-markdown blockquote {
+  border-left: 4px solid hsl(var(--border));
+  color: hsl(var(--muted-foreground));
+  padding-left: 1em;
+  margin: 1em 0;
+}
+
+.wmde-markdown table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+}
+
+.wmde-markdown th,
+.wmde-markdown td {
+  border: 1px solid hsl(var(--border));
+  padding: 6px 13px;
+}
+
+.wmde-markdown tr:nth-child(2n) {
+  background-color: hsl(var(--muted));
+} 
