@@ -1,12 +1,10 @@
 import { FC } from 'react';
-import MDEditor from '@uiw/react-md-editor';
-import rehypeSanitize from 'rehype-sanitize';
+import MarkdownEditor from '@uiw/react-markdown-editor';
 import { cn } from '@/lib/utils';
 
 interface MDXEditorProps {
   value: string;
   onChange?: (value: string) => void;
-  placeholder?: string;
   readOnly?: boolean;
   className?: string;
   minHeight?: number;
@@ -15,35 +13,33 @@ interface MDXEditorProps {
 export const MDXEditor: FC<MDXEditorProps> = ({ 
   value, 
   onChange, 
-  placeholder, 
   readOnly = false,
   className,
   minHeight = 200
 }) => {
   return (
-    <div className={cn("markdown-body", className)} data-color-mode="light">
+    <div className={cn("markdown-wrapper rounded-md border", className)}>
       {readOnly ? (
-        <div className="prose prose-sm max-w-none">
-          <MDEditor.Markdown 
-            source={value || placeholder} 
-            rehypePlugins={[[rehypeSanitize]]}
-            className="bg-transparent px-0"
+        <div className="prose prose-sm max-w-none p-4">
+          <MarkdownEditor.Markdown 
+            source={value || 'No description provided.'} 
+            className="bg-transparent"
           />
         </div>
       ) : (
-        <MDEditor
+        <MarkdownEditor
           value={value}
-          onChange={(val) => onChange?.(val || '')}
-          preview="live"
-          placeholder={placeholder}
-          previewOptions={{
-            rehypePlugins: [[rehypeSanitize]],
-          }}
-          className="border rounded-md bg-background"
+          onChange={onChange}
+          visible
           height={minHeight}
-          hideToolbar={false}
-          toolbarHeight={50}
-          visibleDragbar={false}
+          enableScroll
+          className="bg-background"
+          toolbars={[
+            'bold', 'italic', 'strikethrough', '|',
+            'heading-1', 'heading-2', 'heading-3', '|',
+            'quote', 'unordered-list', 'ordered-list', '|',
+            'link', 'image', 'code', 'table'
+          ]}
         />
       )}
     </div>

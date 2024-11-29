@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { X, Calendar, Clock, AlertCircle, MessageSquare, UserPlus } from "lucide-react";
+import { X, Calendar, Clock, AlertCircle, MessageSquare, UserPlus, Edit, Loader2, Save } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { TaskComment } from "./TaskComment";
@@ -19,6 +19,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { TaskWithDetails, ProjectMember } from "@/types/project.types";
+import { Card } from "../ui/card";
+import { MDXEditor } from "../ui/mdx-editor";
 
 interface TaskDetailsProps {
   taskId: string;
@@ -297,34 +299,89 @@ export function TaskDetails({ taskId, onClose, onUpdate }: TaskDetailsProps) {
         </div>
 
         {/* Description */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label>Description</Label>
-            <Button variant="ghost" size="sm" onClick={() => setIsEditing(!isEditing)}>
-              {isEditing ? "Cancel" : "Edit"}
-            </Button>
-          </div>
-          {isEditing ? (
-            <div className="space-y-2">
-              <Textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Add a more detailed description..."
-                rows={4}
-                className="resize-none"
-              />
-              <Button size="sm" onClick={handleDescriptionSave} disabled={isSubmitting}>
-                Save
-              </Button>
+       
+
+        <div className="space-y-4 border-none">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium" id="description-heading">Description</h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsEditing(!isEditing)}
+                  aria-label={isEditing ? "Cancel editing" : "Edit description"}
+                >
+                  {isEditing ? (
+                    <>
+                      <X className="h-4 w-4 mr-2" />
+                      Cancel
+                    </>
+                  ) : (
+                    <>
+                      <Edit className="h-4 w-4 mr-2" />
+                      Edit
+                    </>
+                  )}
+                </Button>
+              </div>
+
+            
+                {isEditing ? (
+                  <div className="space-y-4">
+                    <MDXEditor
+                      value={description}
+                      onChange={(val) => setDescription(val || '')}
+                      className="min-h-[200px]"
+                      minHeight={200}
+                      aria-labelledby="description-heading"
+                    />
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        onClick={() => {
+                          setIsEditing(false);
+                          setDescription(task?.description || '');
+                        }}
+                        disabled={isSubmitting}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={handleDescriptionSave}
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="h-4 w-4 mr-2" />
+                            Save
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className=" border-none">
+                    {description ? (
+                      <MDXEditor
+                        value={description}
+                        readOnly
+                        className=""
+                        aria-labelledby="description-heading"
+                      />
+                    ) : (
+                      <p className="text-muted-foreground text-sm">
+                        No description provided
+                      </p>
+                    )}
+                  </div>
+                )}
+             
             </div>
-          ) : (
-            <div className="rounded-lg bg-muted/40 p-4 min-h-[100px]">
-              <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                {task.description || "No description provided."}
-              </p>
-            </div>
-          )}
-        </div>
+
 
         {/* Comments Section */}
         <div className="space-y-4 border-t pt-4">

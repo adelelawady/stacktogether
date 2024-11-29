@@ -21,50 +21,39 @@
 }
 
 /* Markdown Editor Styles */
-.markdown-body {
-  background-color: transparent !important;
+.markdown-wrapper {
+  background-color: hsl(var(--background));
 }
 
 .w-md-editor {
-  background-color: hsl(var(--background)) !important;
-  border-color: hsl(var(--border)) !important;
-  box-shadow: none !important;
+  --md-editor-bg-color: transparent !important;
+  --md-editor-border-color: hsl(var(--border)) !important;
+  --md-editor-toolbar-bg: hsl(var(--muted)) !important;
+  --md-editor-toolbar-hover-color: hsl(var(--muted-foreground/0.1)) !important;
+  --md-editor-toolbar-active-color: hsl(var(--muted-foreground/0.2)) !important;
+  --md-editor-text-color: hsl(var(--foreground)) !important;
+  --md-editor-toolbar-color: hsl(var(--foreground)) !important;
 }
 
 .w-md-editor-toolbar {
-  border-color: hsl(var(--border)) !important;
-  background-color: hsl(var(--muted)) !important;
+  border-bottom: 1px solid hsl(var(--border)) !important;
   padding: 8px !important;
 }
 
-.w-md-editor-toolbar ul > li > button {
-  color: hsl(var(--foreground)) !important;
+.w-md-editor-toolbar button {
   margin: 0 2px !important;
 }
 
-.w-md-editor-toolbar ul > li > button:hover {
-  background-color: hsl(var(--muted-foreground/0.1)) !important;
-}
-
-.w-md-editor-text {
-  background-color: transparent !important;
+.w-md-editor-content {
   padding: 16px !important;
 }
 
-.w-md-editor-text-pre, 
-.w-md-editor-text-input,
-.w-md-editor-text-pre > code {
-  color: hsl(var(--foreground)) !important;
+.wmde-markdown {
   font-size: 14px !important;
   line-height: 1.6 !important;
 }
 
-.wmde-markdown {
-  background-color: transparent !important;
-  font-size: 14px !important;
-  padding: 16px !important;
-}
-
+/* Typography styles */
 .wmde-markdown h1,
 .wmde-markdown h2,
 .wmde-markdown h3,
@@ -109,4 +98,10 @@
 
 .wmde-markdown tr:nth-child(2n) {
   background-color: hsl(var(--muted));
+}
+
+/* Dark mode support */
+[data-theme='dark'] .w-md-editor,
+[data-theme='dark'] .wmde-markdown {
+  color: hsl(var(--foreground));
 } 

@@ -9,7 +9,7 @@ import { ProjectMembers } from "@/components/projects/ProjectMembers";
 import { ProjectContent } from "@/components/projects/ProjectContent";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
 import { supabase } from "@/integrations/supabase/client";
-import { Layout, ListTodo, Users as UsersIcon, FileText, ChevronRight, Edit } from "lucide-react";
+import { Layout, ListTodo, Users as UsersIcon, FileText, ChevronRight, Edit, X, Save, Loader2 } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import type { ProjectWithDetails, TaskListWithDetails, TaskWithDetails } from "@/types/project.types";
 import { cn } from "@/lib/utils";
@@ -18,7 +18,6 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GitFork, ExternalLink, Calendar, Users as TeamIcon } from "lucide-react";
-import TaskDetails from "./TaskDetails";
 import { format } from "date-fns";
 import { CheckCircle2, Clock } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
@@ -41,6 +40,9 @@ const ProjectDetails = () => {
   const [activeTab, setActiveTab] = useState<TabType>('content');
   const [isLoading, setIsLoading] = useState(true);
   const [taskLists, setTaskLists] = useState<TaskListWithDetails[]>([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [taskDescription, setTaskDescription] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (projectId) {
@@ -148,6 +150,31 @@ const ProjectDetails = () => {
     // Include both in progress and completed tasks in the progress calculation
     const progressTasks = stats.inProgress * 0.5 + stats.completed;
     return Math.round((progressTasks / stats.total) * 100);
+  };
+
+  const handleDescriptionSave = async () => {
+    if (!selectedTask) return;
+    setIsSubmitting(true);
+
+    const { error } = await supabase
+      .from('tasks')
+      .update({ description: taskDescription })
+      .eq('id', selectedTask.id);
+
+    setIsSubmitting(false);
+    setIsEditing(false);
+
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update description",
+      });
+      return;
+    }
+
+    // Refresh the task lists to show the updated description
+    loadTaskLists();
   };
 
   if (isLoading) {
